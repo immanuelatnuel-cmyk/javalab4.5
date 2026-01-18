@@ -1,91 +1,24 @@
-import java.io.*;
-import java.util.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.List;
 
-public class filesave {
-    
-    public static void saveToFile(ArrayList<Person> people) {
-        try {
-            PrintWriter file = new PrintWriter("data.txt");
-            
-            for (Person p : people) {
-                if (p instanceof Student) {
-                    Student s = (Student) p;
-                    file.println("STUDENT:" + s.name + ":" + s.age + ":" + listToString(s.grades) + ":" + listToString(s.classes));
-                } else if (p instanceof Teacher) {
-                    Teacher t = (Teacher) p;
-                    file.println("TEACHER:" + t.name + ":" + t.age + ":" + t.money + ":" + listToString(t.teachClasses));
-                }
-            }
-            
-            file.close();
-            System.out.println("File saved OK");
-            
-        } catch (Exception e) {
-            System.out.println("Oops! Save error");
-        }
-    }
-    
-    public static ArrayList<Person> loadFromFile() {
-        ArrayList<Person> people = new ArrayList<>();
-        
-        try {
-            File f = new File("data.txt");
-            Scanner sc = new Scanner(f);
-            
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine();
-                String[] stuff = line.split(":");
-                
-                if (stuff[0].equals("STUDENT")) {
-                    ArrayList<Double> g = stringToNumList(stuff[3]);
-                    ArrayList<String> c = stringToList(stuff[4]);
-                    people.add(new Student(stuff[1], Integer.parseInt(stuff[2]), g, c));
-                } else if (stuff[0].equals("TEACHER")) {
-                    ArrayList<String> tc = stringToList(stuff[4]);
-                    people.add(new Teacher(stuff[1], Integer.parseInt(stuff[2]), Double.parseDouble(stuff[3]), tc));
-                }
-            }
-            
-            sc.close();
-            System.out.println("File loaded OK");
-            
-        } catch (FileNotFoundException e) {
-            System.out.println("No file found");
-        } catch (Exception e) {
-            System.out.println("Load error");
-        }
-        
-        return people;
-    }
-    
-    private static String listToString(ArrayList<?> list) {
-        String result = "";
-        for (int i = 0; i < list.size(); i++) {
-            result += list.get(i);
-            if (i < list.size() - 1) result += ",";
-        }
-        return result;
-    }
-    
-    private static ArrayList<Double> stringToNumList(String s) {
-        ArrayList<Double> list = new ArrayList<>();
-        if (s.length() > 0) {
-            String[] parts = s.split(",");
-            for (String part : parts) {
-                list.add(Double.parseDouble(part));
-            }
-        }
-        return list;
-    }
-    
-    private static ArrayList<String> stringToList(String s) {
-        ArrayList<String> list = new ArrayList<>();
-        if (s.length() > 0) {
-            String[] parts = s.split(",");
-            for (String part : parts) {
-                list.add(part);
-            }
-        }
-        return list;
-    }
+public class PersonStorage {
+   public PersonStorage() {
+   }
+
+   public static void save(List<Person> var0, String var1) throws IOException {
+      ObjectOutputStream var2 = new ObjectOutputStream(new FileOutputStream(var1));
+      var2.writeObject(var0);
+      var2.close();
+   }
+
+   public static List<Person> load(String var0) throws IOException, ClassNotFoundException {
+      ObjectInputStream var1 = new ObjectInputStream(new FileInputStream(var0));
+      List var2 = (List)var1.readObject();
+      var1.close();
+      return var2;
+   }
 }
